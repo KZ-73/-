@@ -1,0 +1,183 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strumento di Ripasso</title>
+    <!-- 引入外部 CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入外部 JS，使用 defer 确保在 DOM 加载后执行 -->
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Ripasso Vocaboli e Grammatica</h1>
+        <div class="header-buttons">
+            <button onclick="naviga('home')">Home</button>
+            <button onclick="naviga('gestione')">Gestione Dati</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 主页：选择语言。参考了你提供的布局 image_ec1fdf.png[cite: 1] -->
+        <section id="home" class="view active">
+            <div class="lang-container">
+                <div class="lang-card" onclick="selezionaLingua('latino')">Latino</div>
+                <div class="lang-card" onclick="selezionaLingua('francese')">Francese</div>
+                <div class="lang-card" onclick="selezionaLingua('spagnolo')">Spagnolo</div>
+                <div class="lang-card" onclick="selezionaLingua('inglese')">Inglese</div>
+            </div>
+        </section>
+
+        <!-- 练习菜单：选择练习类型 -->
+        <section id="menu-esercizi" class="view hidden">
+            <h2 id="titolo-lingua">Lingua</h2>
+            <div class="menu-container">
+                <div class="menu-card" onclick="avviaEsercizio('coniugazione')">Coniugazione (动词)</div>
+                <div class="menu-card" id="btn-declinazione" onclick="avviaEsercizio('declinazione')">Declinazione (变格)</div>
+                <div class="menu-card" onclick="avviaEsercizio('vocaboli')">Vocaboli (词汇)</div>
+            </div>
+        </section>
+
+        <!-- 动词变位练习界面 -->
+        <section id="ex-coniugazione" class="view hidden">
+            <div class="esercizio-header">
+                <h2>Coniugazione</h2>
+                <button onclick="avviaEsercizio('coniugazione')">Prossimo (下一题)</button>
+            </div>
+            <!-- Flex 容器：居中对齐左侧题目和右侧答案 -->
+            <div class="coniugazione-container">
+                <!-- 左侧题目卡片 -->
+                <div class="card quiz-card">
+                    <h3 id="verbo-testo">verbo</h3>
+                    <form id="form-coniugazione" onsubmit="verificaConiugazione(event)">
+                        <select id="select-modo" required>
+                            <option value="">Seleziona Modo</option>
+                            <option value="indicativo">Indicativo</option>
+                            <option value="congiuntivo">Congiuntivo</option>
+                            <option value="condizionale">Condizionale</option>
+                            <option value="imperativo">Imperativo</option>
+                            <option value="infinito">Infinito</option>
+                            <option value="participio">Participio</option>
+                            <option value="gerundio">Gerundio</option>
+                        </select>
+                        <select id="select-tempo" required>
+                            <option value="">Seleziona Tempo</option>
+                            <option value="presente">Presente</option>
+                            <option value="imperfetto">Imperfetto</option>
+                            <option value="passato_remoto">Passato Remoto</option>
+                            <option value="futuro">Futuro Semplice</option>
+                            <option value="passato_prossimo">Passato Prossimo</option>
+                        </select>
+                        <select id="select-persona" required>
+                            <option value="">Seleziona Persona</option>
+                            <option value="1s">1a singolare (io)</option>
+                            <option value="2s">2a singolare (tu)</option>
+                            <option value="3s">3a singolare (lui/lei)</option>
+                            <option value="1p">1a plurale (noi)</option>
+                            <option value="2p">2a plurale (voi)</option>
+                            <option value="3p">3a plurale (loro)</option>
+                        </select>
+                        <input type="text" id="input-coniugazione" placeholder="Scrivi il verbo coniugato" required>
+                        <button type="submit">Invia (提交)</button>
+                    </form>
+                </div>
+                <!-- 右侧答案卡片（默认隐藏） -->
+                <div class="card answer-card hidden" id="card-risposta-coniugazione">
+                    <h3>Risposta Corretta</h3>
+                    <p><strong>Modo:</strong> <span id="ans-modo"></span></p>
+                    <p><strong>Tempo:</strong> <span id="ans-tempo"></span></p>
+                    <p><strong>Persona:</strong> <span id="ans-persona"></span></p>
+                    <p class="highlight" id="ans-verbo"></p>
+                    <p id="risultato-coniugazione" class="esito"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 名词变格练习界面 (仅拉丁语) -->
+        <section id="ex-declinazione" class="view hidden">
+            <div class="esercizio-header">
+                <h2>Declinazione</h2>
+                <select id="lingua-prompt-declinazione" onchange="avviaEsercizio('declinazione')">
+                    <option value="latino">Prompt in Latino (看拉丁语选语法)</option>
+                    <option value="italiano">Prompt in Italiano (看意大利语选语法)</option>
+                </select>
+                <button onclick="avviaEsercizio('declinazione')">Prossimo</button>
+            </div>
+            <div class="card full-card">
+                <h3 id="declinazione-testo">parola</h3>
+                <form id="form-declinazione" onsubmit="verificaDeclinazione(event)">
+                    <!-- 12 个变格选项 (CSS Grid / Flex 布局) -->
+                    <div class="checkbox-grid">
+                        <label><input type="checkbox" value="nom_s"> Nominativo Singolare</label>
+                        <label><input type="checkbox" value="gen_s"> Genitivo Singolare</label>
+                        <label><input type="checkbox" value="dat_s"> Dativo Singolare</label>
+                        <label><input type="checkbox" value="acc_s"> Accusativo Singolare</label>
+                        <label><input type="checkbox" value="voc_s"> Vocativo Singolare</label>
+                        <label><input type="checkbox" value="abl_s"> Ablativo Singolare</label>
+                        <label><input type="checkbox" value="nom_p"> Nominativo Plurale</label>
+                        <label><input type="checkbox" value="gen_p"> Genitivo Plurale</label>
+                        <label><input type="checkbox" value="dat_p"> Dativo Plurale</label>
+                        <label><input type="checkbox" value="acc_p"> Accusativo Plurale</label>
+                        <label><input type="checkbox" value="voc_p"> Vocativo Plurale</label>
+                        <label><input type="checkbox" value="abl_p"> Ablativo Plurale</label>
+                    </div>
+                    <button type="submit">Invia</button>
+                </form>
+                <div id="risultato-declinazione" class="esito"></div>
+            </div>
+        </section>
+
+        <!-- 词汇练习界面 -->
+        <section id="ex-vocaboli" class="view hidden">
+            <div class="esercizio-header">
+                <h2>Vocaboli</h2>
+                <select id="lingua-prompt-vocaboli" onchange="avviaEsercizio('vocaboli')">
+                    <option value="italiano">Prompt in Italiano (看意语写外语)</option>
+                    <option value="target">Prompt in Lingua Target (看外语写意语)</option>
+                </select>
+                <button onclick="avviaEsercizio('vocaboli')">Prossimo</button>
+            </div>
+            <div class="card full-card">
+                <h3 id="vocabolo-testo">significato</h3>
+                <form id="form-vocaboli" onsubmit="verificaVocabolo(event)">
+                    <input type="text" id="input-vocabolo" placeholder="Scrivi la traduzione..." required>
+                    <button type="submit">Invia</button>
+                </form>
+                <div id="risultato-vocaboli" class="esito"></div>
+            </div>
+        </section>
+
+        <!-- 数据管理界面 -->
+        <section id="gestione" class="view hidden">
+            <h2>Gestione Dati</h2>
+            <div class="data-actions">
+                <button onclick="esportaDati()">Esporta JSON</button>
+                <input type="file" id="import-file" accept=".json" onchange="importaDati(event)">
+                <button onclick="svuotaDati()" style="background-color: #ff4c4c;">Svuota Tutti i Dati</button>
+            </div>
+            
+            <div class="card form-card">
+                <h3>Aggiungi Vocabolo / Verbo / Declinazione</h3>
+                <!-- 一个简易表单，用来把 JSON 数据文本追加到 LocalStorage -->
+                <p>Seleziona il tipo di dato da aggiungere e inserisci un oggetto JSON valido.</p>
+                <select id="tipo-dato">
+                    <option value="vocaboli">Vocabolo</option>
+                    <option value="coniugazioni">Coniugazione</option>
+                    <option value="declinazioni">Declinazione (solo Latino)</option>
+                </select>
+                <select id="lingua-dato">
+                    <option value="latino">Latino</option>
+                    <option value="francese">Francese</option>
+                    <option value="spagnolo">Spagnolo</option>
+                    <option value="inglese">Inglese</option>
+                </select>
+                <textarea id="json-input" rows="8" placeholder='Esempio per Vocabolo: {"target": "buenos días", "italiano": "buongiorno"}'></textarea>
+                <button onclick="salvaSingoloDato()">Aggiungi</button>
+                <p class="nota">Vedi console (F12) o codice per il formato JSON esatto.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
